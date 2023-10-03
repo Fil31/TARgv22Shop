@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+
 namespace Shop.Core.Domain
 {
     public class Spaceship
@@ -14,8 +15,9 @@ namespace Shop.Core.Domain
         public string Company { get; set; }
         public int CargoWeight { get; set; }
 
-        // only in database
+        //only in database
         public DateTime CreatedAt { get; set; }
         public DateTime ModifiedAt { get; set; }
+
     }
 }

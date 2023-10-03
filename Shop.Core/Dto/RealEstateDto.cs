@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Shop.Core.Dto
 {
@@ -11,13 +7,15 @@ namespace Shop.Core.Dto
     {
         public Guid? Id { get; set; }
         public string Address { get; set; }
-        public float SizeSqrtM { get; set; }
+        public float SizeSqrM { get; set; }
         public int RoomCount { get; set; }
         public int Floor { get; set; }
         public string BuildingType { get; set; }
         public DateTime BuiltInYear { get; set; }
 
-        //only in database
+        public List<IFormFile> Files { get; set; }
+        public IEnumerable<FileToDatabaseDto> Images { get; set; } = new List<FileToDatabaseDto>();
+
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }

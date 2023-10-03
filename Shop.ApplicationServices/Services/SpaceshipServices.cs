@@ -4,6 +4,7 @@ using Shop.Core.Dto;
 using Shop.Core.ServiceInterface;
 using Shop.Data;
 
+
 namespace Shop.ApplicationServices.Services
 {
     public class SpaceshipServices : ISpaceshipServices
@@ -11,7 +12,11 @@ namespace Shop.ApplicationServices.Services
         private readonly ShopContext _context;
         private readonly IFileServices _fileServices;
 
-        public SpaceshipServices(ShopContext context, IFileServices fileServices)
+        public SpaceshipServices
+            (
+                ShopContext context,
+                IFileServices fileServices
+            )
         {
             _context = context;
             _fileServices = fileServices;
@@ -19,6 +24,7 @@ namespace Shop.ApplicationServices.Services
 
         public async Task<Spaceship> Create(SpaceshipDto dto)
         {
+
             Spaceship spaceship = new Spaceship();
 
             spaceship.Id = Guid.NewGuid();
@@ -39,21 +45,22 @@ namespace Shop.ApplicationServices.Services
             return spaceship;
         }
 
+
         public async Task<Spaceship> Update(SpaceshipDto dto)
         {
-            var domain = new Spaceship()
-            {
-                Id = dto.Id,
-                Name = dto.Name,
-                Type = dto.Type,
-                Passengers = dto.Passengers,
-                EnginePower = dto.EnginePower,
-                Crew = dto.Crew,
-                Company = dto.Company,
-                CargoWeight = dto.CargoWeight,
-                CreatedAt = dto.CreatedAt,
-                ModifiedAt = DateTime.Now,
-            };
+            var domain = new Spaceship();
+
+            domain.Id = dto.Id;
+            domain.Name = dto.Name;
+            domain.Type = dto.Type;
+            domain.Passengers = dto.Passengers;
+            domain.EnginePower = dto.EnginePower;
+            domain.Crew = dto.Crew;
+            domain.Company = dto.Company;
+            domain.CargoWeight = dto.CargoWeight;
+            domain.CreatedAt = dto.CreatedAt;
+            domain.ModifiedAt = DateTime.Now;
+            _fileServices.FilesToApi(dto, domain);
 
             _context.Spaceships.Update(domain);
             await _context.SaveChangesAsync();
@@ -66,11 +73,22 @@ namespace Shop.ApplicationServices.Services
             var spaceshipId = await _context.Spaceships
                 .FirstOrDefaultAsync(x => x.Id == id);
 
+            var images = await _context.FileToApis
+                .Where(x => x.SpaceshipId == id)
+                .Select(y => new FileToApiDto
+                 {
+                    Id = y.Id,
+                    SpaceshipId = y.SpaceshipId,
+                    ExistingFilePath = y.ExistingFilePath
+                 }).ToArrayAsync();
+
+            await _fileServices.RemoveImagesFromApi(images);
             _context.Spaceships.Remove(spaceshipId);
             await _context.SaveChangesAsync();
 
             return spaceshipId;
         }
+
 
         public async Task<Spaceship> GetAsync(Guid id)
         {
